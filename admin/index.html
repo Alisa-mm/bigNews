@@ -51,8 +51,30 @@
         </div>
         <!-- 右侧主体内容 -->
         <div class="main" id="main_body">
-
         </div>
     </div>
 </body>
+<script src="./libs/tinymce/http.js"></script>
+<script>
+$(function(){
+    // 跳转到系统首页 就发送ajax请求 获取用户数据
+    $.ajax({
+        url:BigNew.user_info,
+        type:'get',
+        // 设置请求头，带上token，否则请求不成功
+         headers: {
+        'Authorization': window.localStorage.getItem('token')
+        },
+        success:function(res){
+            console.log(res);
+            if(res.code===200){
+                // 获取服务器返回的数据 然后渲染回页面
+                $('.user_info img').attr('src',res.data.userPic);
+                $('.user_info span').html(`欢迎&nbsp;&nbsp;${res.data.nickname}`)
+                $('.user_center_link>img').attr('src',res.data.userPic);
+            }
+        }
+    })
+})
+</script>
 </html>
