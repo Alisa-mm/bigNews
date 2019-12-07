@@ -62,9 +62,10 @@ $(function(){
         url:BigNew.user_info,
         type:'get',
         // 设置请求头，带上token，否则请求不成功
-         headers: {
+        // 因为每个页面都要用 所以封装到jq里面了
+     /*     headers: {
         'Authorization': window.localStorage.getItem('token')
-        },
+        }, */
         success:function(res){
             console.log(res);
             if(res.code===200){
