@@ -75,6 +75,14 @@ $(function(){
             }
         }
     })
+    // 退出处理
+    // 点击退出 退回登录页面 并且清除token
+    $('.logout').on('click',function(){
+        // 清除token
+        localStorage.removeItem('token');
+        //跳转到登录页面
+        location.href = './login.html'
+    })
 })
 </script>
 </html>
