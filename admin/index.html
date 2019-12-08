@@ -44,7 +44,10 @@
         <!-- 顶部栏 -->
         <div class="header_bar">
             <div class="user_center_link">
-                <a href="./user.html" target="main_frame">个人中心</a>
+                <!-- 1.细节优化：给index.html页面的右侧顶部个人中心按钮设置target属性指向iframe的name，并且注册行内事件：主动触发左侧个人中心按钮的点击事件 -->
+                <!-- trigger() 方法触发被选元素上指定的事件以及事件的默认行为
+                    主动触发左侧导航栏个人中心的点击事件,来修改a标签高亮效果(就是点击右侧个人中心时，左侧个人中心会高亮) -->
+                <a href="./user.html" onclick = "$('#user').trigger('click')" target="main_frame">个人中心</a>
                 <img src="images/2.jpg" alt="person">
                 <a href="javascript:void(0)" class="logout"><i class="iconfont icon-tuichu"></i> 退出</a>
             </div>
