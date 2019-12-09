@@ -75,66 +75,82 @@
      1.进入user.html页面 就开始发送ajax请求，拿到服务器返回的信息 进行页面渲染
      2.文件预览功能（选择图片）
      3.编辑信息，上传个人信息*/
-// 最好放进入口函数中
-$(function(){
-    // 1.页面一加载 发送ajax请求个人详细信息，渲染页面
-$.ajax({
-    url:BigNew.user_detail,
-    type:'get',
-    dataType:'json',
-    success:function(res){
-        // console.log(res);
-        // 渲染页面
-      /*   $('.username').val(res.data.username);
-        $('.nickname').val(res.data.nickname);
-        $('.email').val(res.data.email);
-        $('.password').val(res.data.password); */
-        // 遍历对象 优化代码(因为我们渲染页面的表单元素`类名`与服务器返回的对象`属性名一致`)
-        for(key in res.data){
-            $('.'+key).val(res.data[key]);
-        }
-        $('.user_pic').attr('src',res.data.userPic);
-    }
-})
-//2. 文件预览功能
-//给file表单元素注册onchange事件
-$('#exampleInputFile').on('change',function(){
-    // 获取图片
-    let file = this.files[0];
-    /*  URL.createObjectUR 创建一个新的对象URL,该对象URL可以代表某一个指定的File对象或Blob对象.
-     语法：objectURL = window.URL.createObjectURL(blob);
-     blob参数是一个File对象或者Blob对象.
-     objectURL是生成的对象URL.通过这个URL,可以获取到所指定文件的完整内容. */
-    // 所以我们可以通过这个 将文件转换为路径
-    let  url = URL.createObjectURL(file);
-    // 把路径赋值给图片
-    $('.user_pic').attr('src',url);
-})
-// 3.编辑个人信息 上传
-// 给整个表单注册提交事件
-$('#form').on('submit',function(e){
-    // 禁用表单默认提交事件
-    e.preventDefault();
-    // 发送ajax请求 上传数据
-    $.ajax({
-        url:BigNew. user_edit,
-        type:'post',
-        dataType:'json',
-        data:new FormData(this),//这里有点不太懂
-        processData:false,
-        contentType:false,
-        success:function(res){
-            console.log(res);
-            if(res.code===200){
-                alert('修改成功');
-                // 当前页面父窗口 window.parent
-                // 当user.html页面修改时，index系统首页 个人信息也要同步修改
-                window.parent.location.reload();
+    // 最好放进入口函数中
+    $(function () {
+        // 1.页面一加载 发送ajax请求个人详细信息，渲染页面
+        $.ajax({
+            url: BigNew.user_detail,
+            type: 'get',
+            dataType: 'json',
+            success: function (res) {
+                console.log(res.data);
+                // 渲染页面
+                /*  $('.username').val(res.data.username);
+                  $('.nickname').val(res.data.nickname);
+                  $('.email').val(res.data.email);
+                  $('.password').val(res.data.password);
+                  $('.user_pic').attr('src',res.data.userPic)*/
+                // 遍历对象 优化代码(因为我们渲染页面的表单元素`类名`与服务器返回的对象`属性名一致`)
+                for (let key in res.data) {
+                    $('.' + key).val(res.data[key]);
+                }
+                $('.user_pic').attr('src', res.data.userPic);
             }
-        }
+        })
+        //2. 文件预览功能
+        //给file表单元素注册onchange事件
+        $('#exampleInputFile').on('change', function () {
+            // 获取图片
+            let file = this.files[0];
+            /*  URL.createObjectUR 创建一个新的对象URL,该对象URL可以代表某一个指定的File对象或Blob对象.
+             语法：objectURL = window.URL.createObjectURL(blob);
+             blob参数是一个File对象或者Blob对象.
+             objectURL是生成的对象URL.通过这个URL,可以获取到所指定文件的完整内容. */
+            // 所以我们可以通过这个 将文件转换为路径
+            // 3.编辑个人信息 上传
+            let url = URL.createObjectURL(file);
+            // 把路径赋值给图片
+            $('.user_pic').attr('src', url);
+        })
+        // 给修改按钮注册点击事件
+        $('.btn-edit').on('click', function (e) {
+            //阻止表单默认提交事件
+            e.preventDefault();
+            // 获取form表单数据,转成原生DOM对象
+            let form = $('#form')[0];
+            let data = new FormData(form);
+            // 发送ajax请求
+            $.ajax({
+                url: BigNew.user_edit,
+                type: 'post',
+                data: data,
+                processData: false,
+                contentType: false,
+                success: function (res) {
+                    if (res.code === 200) {
+                        alert('修改成功');
+                        // 当user.html页面修改时，index系统首页 个人信息也要同步修改
+                        // window.parent.location.reload();
+                        //我们刷新页面的时候 不需要刷新整个首页 我们只需要 个人信息同步修改就可以 再发一次ajax请求
+                        $.ajax({
+                            url: BigNew.user_info,
+                            type: 'get',
+                            dataType: 'json',
+                            success: function (res) {
+                                if (res.code === 200) {
+                                    // 获取服务器返回的数据 然后渲染回页面
+                                    parent.$('.user_info img').attr('src', res.data.userPic);
+                                    parent.$('.user_info span').html(`欢迎&nbsp;&nbsp;${res.data.nickname}`)
+                                    parent.$('.user_center_link>img').attr('src', res.data.userPic);
+                                }
+                            }
+                        })
+                    }
+                }
+            })
+        })
     })
-})
-})
 
 </script>
+
 </html>
