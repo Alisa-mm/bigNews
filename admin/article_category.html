@@ -64,8 +64,8 @@
                 </div>
                 <div class="modal-body">
                     <form>
-                         <!-- 使用这个隐藏域来存储文章分类id -->
-                         <input type="hidden" name="id" id="cateid">
+                        <!-- 使用这个隐藏域来存储文章分类id -->
+                        <input type="hidden" name="id" id="cateid">
                         <div class="form-group">
                             <label for="recipient-name" class="control-label">文章分类名称</label>
                             <input type="text" class="form-control" id="recipient-name">
@@ -93,7 +93,7 @@
                 <td>{{$value.slug}}</td>
                 <td class="text-center">
                     <a href="javascript:void(0)" data-id = "{{$value.id}}" data-toggle="modal" data-target="#myModal" class=" btn btn-info btn-xs">编辑</a>
-                    <a href="javascript:void(0)" data-id = "{{$value.id}}" class="btn btn-danger btn-xs">删除</a>
+                    <a href="javascript:void(0)" data-id = "{{$value.id}}" class="btn btn-danger btn-xs" id='btn-delete'>删除</a>
                 </td>
             </tr>
         {{/each}}
@@ -118,8 +118,8 @@
                     }
                 })
             }
-                //当点击取消按钮的时候，将表单中的数据全部重置
-                $('#btn-cancel').on('click', function () {
+            //当点击取消按钮的时候，将表单中的数据全部重置
+            $('#btn-cancel').on('click', function () {
                 $('form')[0].reset();
             })
             //点击新增按钮和编辑按钮的时候，都要弹出模态框
@@ -139,7 +139,7 @@
                     $('#btn-confirm').on('click', function () {
                         let name = $('#recipient-name').val();
                         let slug = $('#message-text').val();
-                           
+
                         //判断为非空
                         if (name == '' || slug == '') {
                             alert('请输入正确的名称')
@@ -163,20 +163,20 @@
                         })
                     })
 
-                }else{
+                } else {
                     //如果是编辑按钮触发的模态框
                     $('#exampleModalLabel').text('编辑文章分类');
                     $('#btn-confirm').text('编辑').addClass('btn-primary').removeClass('btn-success');
                     // 得到文章类别的id 根据id发送ajax请求
                     let id = $(dom).attr('data-id');
                     $.get({
-                        url:BigNew.category_search,
-                        data:{
-                            id:id
+                        url: BigNew.category_search,
+                        data: {
+                            id: id
                         },
-                        success:function(res){
+                        success: function (res) {
                             console.log(res);
-                            if(res.code==200){
+                            if (res.code == 200) {
                                 $('#recipient-name').val(res.data[0].name)
                                 $('#message-text').val(res.data[0].slug)
                                 $('#cateid').val(res.data[0].id)
@@ -209,7 +209,27 @@
 
             })
 
+            // 用委托实现删除
+            $('tbody').on('click', '#btn-delete', function () {
+                // 获取id 根据id删除文章
+                let id = $(this).attr('data-id');
+                let ans = confirm('你确定要删除吗？');
+                if (ans) {
+                    $.post({
+                        url: BigNew.category_delete,
+                        data: {
+                            id: id,
+                        },
+                        success: function (res) {
+                            console.log(res);
 
+                            if (res.code === 204) {
+                                getData();
+                            }
+                        }
+                    })
+                }
+            })
 
 
         })
