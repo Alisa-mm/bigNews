@@ -73,5 +73,37 @@
         </div>
     </div>
 </body>
+<!-- 引入地址 -->
+<script src="./libs/tinymce/http.js"></script>
+<!-- 文章分类的模板引擎 -->
+<script type="text/html" id="categorylist">
+    <option value="">所有分类</option>
+    {{each data}}
+    <option>{{$value.name}}</option>
+    {{/each}}
+</script>
+<script>
+/* 点到文章列表的时候，要先获取select表单里面的所有数据 */
+// 1.先获取select表单的数据（文章类别信息）
+$(function(){
+    // 1.发送ajax请求获取文章类别信息
+    $.get({
+        url:BigNew.category_list,
+        success:function(res){
+            console.log(res);
+            if(res.code===200){
+                // 获取成功之后，用模板引擎把数据渲染到页面上
+                let htmlStr = template('categorylist',res);
+                $('#selCategory').html(htmlStr);
+            }
+        }
+    })
 
+
+
+
+
+})
+
+</script>
 </html>

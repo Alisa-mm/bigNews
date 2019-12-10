@@ -186,7 +186,7 @@
                     $('#btn-confirm').on('click', function () {
                         let name = $('#recipient-name').val()
                         let slug = $('#message-text').val()
-                        let id = $('#cateid').val()
+                        let id = $('#cateid').val();
                         $.post({
                             url: BigNew.category_edit,
                             data: {
