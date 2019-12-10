@@ -82,7 +82,7 @@
 <script type="text/html" id="categorylist">
     <option value="">所有分类</option>
     {{each data}}
-    <option>{{$value.name}}</option>
+    <option value="{{$value.id}}">{{$value.name}}</option>
     {{/each}}
 </script>
 <!-- 文章条目信息的模板 -->
@@ -166,6 +166,29 @@
             }
         })
 
+        //3.给筛选按钮注册事件
+        $('#btnSearch').on('click', function (e) {
+            e.preventDefault();
+            // 发送ajax请求，获取数据 渲染到页面
+            $.get({
+                url: BigNew.article_query,
+                data: {
+                    type: $('#selCategory').val(),
+                    state: $('#selStatus').val(),
+                    page: 1,
+                    perpage: 10,
+                },
+                success: function (res){
+                    if (res.code === 200) {
+                        let htmlStr = template('articleList', res);
+                        $('tbody').html(htmlStr);
+                        // 修改总页码数
+                        $('#pagination-demo').twbsPagination('changeTotalPages',res.data.totalPage,1)
+                    }
+                }
+            })
+
+        })
     })
 
 </script>
