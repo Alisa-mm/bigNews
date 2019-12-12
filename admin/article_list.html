@@ -120,50 +120,50 @@
             }
         })
         //2.要发送ajax请求,获取文章条目信息，渲染到页面
-    /*     $.get({
-            url: BigNew.article_query,
-            data: {
-                type: $('#selCategory').val(),
-                state: $('#selStatus').val(),
-                page: 1,
-                perpage: 10,
-            },
-            success: function (res) {
-                console.log(res);
-                if (res.code === 200) {
-                    let htmlStr = template('articleList', res);
-                    $('tbody').html(htmlStr);
-                    // 将页面的页码条显示出来，调用分页器的方法
-                    $('#pagination-demo').twbsPagination({
-                        totalPages: res.data.totalPage,
-                        visiblePages: 6,
-                        first: '首页',
-                        prev: '上一页',
-                        next: '下一页',
-                        last: '尾页',
-                        onPageClick: function (event, page) {
-                            $('#page-content').text('Page ' + page);
-                            // 分页之后，再渲染一次页面
-                            $.get({
-                                url: BigNew.article_query,
-                                data: {
-                                    type: $('#selCategory').val(),
-                                    state: $('#selStatus').val(),
-                                    page: page,
-                                    perpage: 10,
-                                },
-                                success: function (res) {
-                                    if (res.code === 200) {
-                                        let htmlStr = template('articleList', res);
-                                        $('tbody').html(htmlStr);
+        /*     $.get({
+                url: BigNew.article_query,
+                data: {
+                    type: $('#selCategory').val(),
+                    state: $('#selStatus').val(),
+                    page: 1,
+                    perpage: 10,
+                },
+                success: function (res) {
+                    console.log(res);
+                    if (res.code === 200) {
+                        let htmlStr = template('articleList', res);
+                        $('tbody').html(htmlStr);
+                        // 将页面的页码条显示出来，调用分页器的方法
+                        $('#pagination-demo').twbsPagination({
+                            totalPages: res.data.totalPage,
+                            visiblePages: 6,
+                            first: '首页',
+                            prev: '上一页',
+                            next: '下一页',
+                            last: '尾页',
+                            onPageClick: function (event, page) {
+                                $('#page-content').text('Page ' + page);
+                                // 分页之后，再渲染一次页面
+                                $.get({
+                                    url: BigNew.article_query,
+                                    data: {
+                                        type: $('#selCategory').val(),
+                                        state: $('#selStatus').val(),
+                                        page: page,
+                                        perpage: 10,
+                                    },
+                                    success: function (res) {
+                                        if (res.code === 200) {
+                                            let htmlStr = template('articleList', res);
+                                            $('tbody').html(htmlStr);
+                                        }
                                     }
-                                }
-                            })
-                        }
-                    })
+                                })
+                            }
+                        })
+                    }
                 }
-            }
-        }) */
+            }) */
         // 2.第二步的优化  把多次使用的代码 封装起来 优化一下代码
         // 封装获取数据的方法
         function getData(page, callback) {
@@ -181,16 +181,25 @@
                         let htmlStr = template('articleList', res);
                         $('tbody').html(htmlStr);
                         // 渲染数据之后，还要在这里写代码 用回调函数
-                        if(callback !=null ){
+                        if (res.data.length != 0 && callback != null) {
+                            $('#pagination-demo').show();
+                            $('#tips').hide();
                             callback(res);
+                        } else if (res.data.totalPage != 0 && res.data.data.length == 0 && res.data.totalPage == mypage - 1) {
+                            mypage -= 1;
+                            $('#pagination-demo').twbsPagination('changeTotalPages', res.data.totalPage, mypage)
+                        } else {
+                            $('#pagination-demo').hide();
+                            $('#tips').show();
                         }
-                       
+
                     }
                 }
             })
         }
         // 页面加载就要展示文章条目信息 调用getDate函数
-        getData(1, function (res) {
+        let mypage = 1;
+        getData(mypage, function (res) {
             $('#pagination-demo').twbsPagination({
                 totalPages: res.data.totalPage,
                 visiblePages: 6,
@@ -199,8 +208,9 @@
                 next: '下一页',
                 last: '尾页',
                 onPageClick: function (event, page) {
-                    $('#page-content').text('Page ' + page);
-                    getData(page,null);
+                    // $('#page-content').text('Page ' + page);
+                    mypage = page;
+                    getData(mypage, function () { });
                 }
             })
         })
@@ -209,50 +219,50 @@
         $('#btnSearch').on('click', function (e) {
             e.preventDefault();
             // 发送ajax请求，获取数据 渲染到页面
-            getData(1,function(res){
+            getData(1, function (res) {
                 // 修改总页码数
-                $('#pagination-demo').twbsPagination('changeTotalPages', res.data.totalPage, 1)
+                $('#pagination-demo').twbsPagination('changeTotalPages', res.data.totalPage, mypage)
             });
-           /*  $.get({
-                url: BigNew.article_query,
-                data: {
-                    type: $('#selCategory').val(),
-                    state: $('#selStatus').val(),
-                    page: 1,
-                    perpage: 10,
-                },
-                success: function (res) {
-                    if (res.code === 200) {
-                        let htmlStr = template('articleList', res);
-                        $('tbody').html(htmlStr);
-                        // 修改总页码数
-                        $('#pagination-demo').twbsPagination('changeTotalPages', res.data.totalPage, 1)
-                    }
-                }
-            }) */
+            /*  $.get({
+                 url: BigNew.article_query,
+                 data: {
+                     type: $('#selCategory').val(),
+                     state: $('#selStatus').val(),
+                     page: 1,
+                     perpage: 10,
+                 },
+                 success: function (res) {
+                     if (res.code === 200) {
+                         let htmlStr = template('articleList', res);
+                         $('tbody').html(htmlStr);
+                         // 修改总页码数
+                         $('#pagination-demo').twbsPagination('changeTotalPages', res.data.totalPage, 1)
+                     }
+                 }
+             }) */
 
         })
 
         //数据都是动态生成的 委托删除
-        $('tbody').on('click','.delete',function(){
+        $('tbody').on('click', '.delete', function () {
             let articleId = $(this).attr('data-id');
-            if(confirm('你确定要删除吗')){
+            if (confirm('你确定要删除吗')) {
                 $.post({
-                    url:BigNew.article_delete,
-                    data:{
-                        id:articleId,
+                    url: BigNew.article_delete,
+                    data: {
+                        id: articleId,
                     },
-                    success:function(res){
+                    success: function (res) {
                         // console.log(res);
                         // 删除成功之后 重新渲染一下页面
-                        getData(1,function(res){
-                            $('#pagination-demo').twbsPagination('changeTotalPages',res.data.totalPage,1)
+                        getData(mypage, function (res) {
+                            $('#pagination-demo').twbsPagination('changeTotalPages', res.data.totalPage, mypage)
                         })
-                        
+
                     }
                 })
             }
-            
+
         })
     })
 
