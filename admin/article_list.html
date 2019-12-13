@@ -181,7 +181,7 @@
                         let htmlStr = template('articleList', res);
                         $('tbody').html(htmlStr);
                         // 渲染数据之后，还要在这里写代码 用回调函数
-                        if (res.data.length != 0 && callback != null) {
+                        if (res.data.data.length != 0 && callback != null) {
                             $('#pagination-demo').show();
                             $('#tips').hide();
                             callback(res);
@@ -210,7 +210,7 @@
                 onPageClick: function (event, page) {
                     // $('#page-content').text('Page ' + page);
                     mypage = page;
-                    getData(mypage, function () { });
+                    getData(mypage, function () {});
                 }
             })
         })
@@ -258,7 +258,6 @@
                         getData(mypage, function (res) {
                             $('#pagination-demo').twbsPagination('changeTotalPages', res.data.totalPage, mypage)
                         })
-
                     }
                 })
             }
