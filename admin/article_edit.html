@@ -146,7 +146,7 @@
         $('.btn-edit').on('click',function(e){
             e.preventDefault();
             // 获取form表单的数据,使用FormDate提交数据
-            let fd =new FormData($('form')[0]);
+            let fd =new FormData($('#form')[0]);
             fd.append('content',editor.txt.html());
             fd.append('id',articleId);
             fd.append('state','已发布')//修改之后，默认状态应该是发布

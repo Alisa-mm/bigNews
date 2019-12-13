@@ -10,10 +10,17 @@
     <link rel="stylesheet" href="css/reset.css">
     <link rel="stylesheet" href="css/iconfont.css">
     <link rel="stylesheet" href="css/main.css">
+    <!-- 引入日期插件的css -->
+    <link rel="stylesheet" href="./libs/jedate/css/jeDate-test.css">
+    <link rel="stylesheet" href="./libs/jedate/css/jedate.css">
     <!-- jq -->
     <script src="./libs/jquery-1.12.4.min.js"></script>
     <!-- 模板引擎 -->
     <script src="./libs/template-web.js"></script>
+    <!-- 引入日期插件js文件 -->
+    <script src="./libs/jedate/js/jedate.js"></script>
+    <!-- 引入富文本编辑器js -->
+    <script src="./libs/wangEditor.js"></script>
 </head>
 
 <body>
@@ -51,11 +58,22 @@
                 <div class="form-group">
                     <label class="col-sm-2 control-label">发布时间：</label>
                     <div class="col-sm-4">
+                           <!--  <input type="text" class="jeinput" id="testico" placeholder="YYYY-MM-DD" name="date">
+                            <div class="icons jebtns" onclick="jeDate('#testico',{trigger:false,isTime: true,
+                                    minDate: '2014-09-19 00:00:00',zIndex:30000})">
+                            </div> -->
+                            <input type="text" class="jeinput" id="testico" placeholder="YYYY-MM-DD" name="date">
+                            <div class="icons jebtns"
+                                onclick="jeDate('#testico',{trigger:false,format: 'YYYY-MM-DD',zIndex:30000})">
+                            </div>
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="inputEmail3" class="col-sm-2 control-label">文章内容：</label>
                     <div class="col-sm-10">
+                         <div id="editor">
+                                    <p>请发表您的文章</p>
+                                </div>
                     </div>
                 </div>
                 <div class="form-group">
@@ -68,5 +86,99 @@
         </div>
     </div>
 </body>
+<script src="./libs/tinymce/http.js"></script>
+<!-- 文章分类的模板 -->
+<!-- 要给option加一个value值 里面写上id 以便后面我们能获取到 -->
+<script type="text/html" id="categorylist">
+    {{each data}}
+    <option value="{{$value.id}}">{{$value.name}}</option>
+    {{/each}}
+</script>
+
+<script>
+    $(function () {
+        // 1.实现图片预览
+        $('#inputCover').on('change', function () {
+            let file = this.files[0];
+            let url = URL.createObjectURL(file);
+            $('.article_cover').attr('src', url);
+        })
+        // 2.发送ajax请求 将文章分类渲染数据到页面上
+        $.get({
+            url: BigNew.category_list,
+            success: function (res) {
+                // console.log(res);
+                if (res.code === 200) {
+                    // 获取成功之后，用模板引擎把数据渲染到页面上
+                    let htmlStr = template('categorylist', res);
+                    $('.category').html(htmlStr);
+                }
+            }
+        })
+        //3. 添加日期插件
+        // 添加日期插件方法 
+       /*  jeDate("#testico", {
+            isTime: true,//是否开启时间选择
+            minDate: "2014-09-19 00:00:00",
+            zIndex: 30000//提高层级 防止后面的富文本编辑器层级高过这个 
+        }) */
+        jeDate("#testico", {
+                isinitVal: true,
+                format: "YYYY-MM-DD",
+                isTime: false,
+                minDate: "2014-09-19 00:00:00",
+                zIndex: 30000
+            })
+        //4.添加富文本编辑器
+        var E = window.wangEditor
+        var editor = new E('#editor')
+        editor.create();
+
+        //给发布按钮注册事件
+        $('.btn-release').on('click', function (e) {
+            e.preventDefault();
+            // 获取form表单的数据,使用FormDate提交数据
+            let fd = new FormData($('#form')[0]);
+            console.log($('#form'));
+            
+            fd.append('content', editor.txt.html());
+            fd.append('state', '已发布')//默认状态应该是发布
+            //发送ajax请求，添加文章数据
+            $.post({
+                url: BigNew.article_publish,
+                data: fd,
+                processData: false,
+                contentType: false,
+                success: function (res) {
+                    console.log(res);
+                    if (res.code == 200) {
+                        window.history.back();
+                    }
+                }
+            })
+        });
+
+        // 存草稿的功能
+        $('.btn-draft').on('click',function(e){
+            e.preventDefault();
+            let fd = new FormData($('#form')[0]);
+            fd.append('content',editor.txt.html());
+            //发送ajax请求，添加文章数据
+            $.post({
+                    url: BigNew.article_publish,
+                    data: fd,
+                    processData: false,
+                    contentType: false,
+                    success: function (res) {
+                        // console.log(res);
+                        if (res.code == 200) {
+                            window.history.back();
+                        }
+                    }
+                })
+        })
+       
+    })
+</script>
 
 </html>
